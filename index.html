@@ -7,12 +7,15 @@
   <style>
     :root {
       --accent: #7C0B99;
-      --accent-dim: rgba(124,11,153,0.12);
+      --accent-dim: rgba(124,11,153,0.10);
       --bg: #F4F4F6;
       --card: #FFFFFF;
       --text: #111111;
       --muted: #6B6B6B;
       --border: #E3E3E8;
+      --fs-sm: 14px;
+      --fs-md: 16px;
+      --fs-lg: 20px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,6 +26,28 @@
       color: var(--text);
       -webkit-font-smoothing: antialiased;
     }
+
+    /* ── SCREEN TRANSITIONS ── */
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to   { opacity: 0; }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .screen-enter-fwd  { animation: slideInRight 0.28s ease forwards; }
+    .screen-enter-back { animation: slideInLeft  0.28s ease forwards; }
+    .screen-exit       { animation: fadeOut      0.18s ease forwards; pointer-events: none; }
 
     /* ════════════════════════════════
        WELCOME SCREEN
@@ -46,10 +71,8 @@
     .w-hero::before {
       content: '';
       position: absolute;
-      top: -50px;
-      right: -60px;
-      width: 230px;
-      height: 230px;
+      top: -50px; right: -60px;
+      width: 230px; height: 230px;
       border-radius: 50%;
       background: rgba(255,255,255,0.07);
       pointer-events: none;
@@ -58,17 +81,15 @@
     .w-hero::after {
       content: '';
       position: absolute;
-      bottom: -70px;
-      left: -30px;
-      width: 170px;
-      height: 170px;
+      bottom: -70px; left: -30px;
+      width: 170px; height: 170px;
       border-radius: 50%;
       background: rgba(255,255,255,0.05);
       pointer-events: none;
     }
 
     .w-eyebrow {
-      font-size: 11px;
+      font-size: var(--fs-sm);
       font-weight: 700;
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -87,8 +108,7 @@
     }
 
     .w-question {
-      font-size: 16px;
-      font-weight: 400;
+      font-size: var(--fs-md);
       line-height: 1.55;
       opacity: 0.82;
       position: relative;
@@ -96,7 +116,7 @@
 
     .w-prompt {
       padding: 28px 20px 14px;
-      font-size: 11px;
+      font-size: var(--fs-sm);
       font-weight: 700;
       color: var(--muted);
       text-transform: uppercase;
@@ -122,20 +142,21 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-      transition: border-color 0.12s, transform 0.1s;
+      transition: border-color 0.15s, transform 0.12s, box-shadow 0.15s;
       text-align: left;
       width: 100%;
       animation: fadeUp 0.35s ease both;
     }
 
     .opt-btn:nth-child(1) { animation-delay: 0.05s; }
-    .opt-btn:nth-child(2) { animation-delay: 0.1s;  }
+    .opt-btn:nth-child(2) { animation-delay: 0.10s; }
     .opt-btn:nth-child(3) { animation-delay: 0.15s; }
-    .opt-btn:nth-child(4) { animation-delay: 0.2s;  }
+    .opt-btn:nth-child(4) { animation-delay: 0.20s; }
 
     .opt-btn:active {
       border-color: var(--accent);
-      transform: scale(0.96);
+      transform: scale(0.95);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
 
     .opt-number {
@@ -147,22 +168,17 @@
     }
 
     .opt-unit {
-      font-size: 18px;
+      font-size: var(--fs-lg);
       font-weight: 700;
       color: var(--text);
       margin-top: 2px;
     }
 
     .opt-days {
-      font-size: 11.5px;
+      font-size: var(--fs-sm);
       color: var(--muted);
       margin-top: 10px;
       font-weight: 500;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
     }
 
     /* ════════════════════════════════
@@ -170,22 +186,15 @@
     ════════════════════════════════ */
     #listScreen { display: none; }
 
-    /* Sticky block: purple bar + search below it */
     .sticky-top {
       position: sticky;
       top: 0;
       z-index: 200;
     }
 
-    .purple-bar {
-      background: var(--bg);
-      padding: 10px 16px;
-    }
+    .top-bar { background: var(--bg); padding: 10px 16px; }
 
-    .header-nav {
-      display: flex;
-      align-items: center;
-    }
+    .header-nav { display: flex; align-items: center; }
 
     .back-btn {
       background: none;
@@ -196,7 +205,10 @@
       -webkit-tap-highlight-color: transparent;
       display: flex;
       align-items: center;
+      transition: opacity 0.15s;
     }
+
+    .back-btn:active { opacity: 0.35; }
 
     .back-btn svg {
       width: 22px;
@@ -215,54 +227,60 @@
 
     .period-sub {
       text-align: center;
-      font-size: 13px;
+      font-size: var(--fs-sm);
       color: var(--muted);
       margin-top: 2px;
       padding-bottom: 2px;
     }
 
-    /* Search bar — outside purple, still inside sticky block */
-    .search-section {
-      background: var(--bg);
-      padding: 10px 16px;
-    }
+    /* Search */
+    .search-section { background: var(--bg); padding: 10px 16px; }
 
     .search-wrap { position: relative; }
 
-    .search-wrap svg {
+    .search-wrap svg.search-icon {
       position: absolute;
-      left: 12px;
+      left: 14px;
       top: 50%;
       transform: translateY(-50%);
       width: 16px;
       height: 16px;
-      stroke: #999;
+      stroke: #aaa;
+      fill: none;
       pointer-events: none;
+      transition: stroke 0.2s;
     }
+
+    .search-wrap:focus-within svg.search-icon { stroke: var(--accent); }
 
     #searchInput {
       width: 100%;
-      padding: 11px 36px 11px 38px;
+      padding: 12px 40px 12px 42px;
       border-radius: 24px;
-      border: none;
-      font-size: 16px;
-      background: rgba(255,255,255,0.75);
+      border: 2px solid transparent;
+      font-size: var(--fs-md);
+      background: rgba(255,255,255,0.85);
       color: var(--text);
       outline: none;
       -webkit-appearance: none;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
     }
 
-    #searchInput::placeholder { color: #aaa; }
+    #searchInput:focus {
+      background: white;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(124,11,153,0.10);
+    }
 
     #clearBtn {
       position: absolute;
-      right: 10px;
+      right: 12px;
       top: 50%;
       transform: translateY(-50%);
-      background: #bbb;
+      background: #ccc;
       border: none;
       color: white;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 800;
       width: 20px;
       height: 20px;
@@ -271,9 +289,12 @@
       display: none;
       align-items: center;
       justify-content: center;
+      transition: background 0.15s;
     }
 
-    /* ── CHIPS ── */
+    #clearBtn:active { background: #999; }
+
+    /* Chips */
     .chips-wrap { padding: 10px 16px; }
 
     .chips {
@@ -288,19 +309,21 @@
 
     .chip {
       flex-shrink: 0;
-      padding: 6px 14px;
+      padding: 7px 14px;
       border-radius: 20px;
       border: none;
       background: white;
-      font-size: 12.5px;
+      font-size: var(--fs-sm);
       font-weight: 500;
       color: var(--muted);
       cursor: pointer;
       white-space: nowrap;
-      transition: background 0.12s, color 0.12s;
+      transition: background 0.15s, color 0.15s, transform 0.1s;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
+
+    .chip:active { transform: scale(0.92); }
 
     .chip.active {
       background: var(--accent);
@@ -308,7 +331,7 @@
       font-weight: 600;
     }
 
-    /* ── ITEMS ── */
+    /* Items */
     .items-wrap { padding: 4px 14px 40px; }
 
     .toolbar {
@@ -319,23 +342,43 @@
       padding: 0 2px;
     }
 
-    .results-label { font-size: 12px; color: var(--muted); }
+    .results-label { font-size: var(--fs-sm); color: var(--muted); }
 
-    .sort-select {
-      font-size: 12px;
-      color: var(--muted);
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 5px 22px 5px 8px;
+    /* Sort icon + hidden select overlay */
+    .sort-wrap { position: relative; }
+
+    .sort-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      padding: 4px;
       cursor: pointer;
-      outline: none;
-      -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23bbb'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 7px center;
+      -webkit-tap-highlight-color: transparent;
     }
 
+    .sort-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--muted);
+      fill: none;
+      stroke-linecap: round;
+      transition: stroke 0.15s;
+    }
+
+    .sort-btn.active-sort svg { stroke: var(--accent); }
+
+    #sortSelect {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 1;
+      font-size: var(--fs-md);
+    }
+
+    /* List */
     .list-container {
       background: var(--card);
       border-radius: 14px;
@@ -350,20 +393,22 @@
       gap: 14px;
       padding: 14px 16px;
       border-bottom: 1px solid var(--border);
+      transition: background 0.12s;
     }
     .list-item:last-child { border-bottom: none; }
+    .list-item:active { background: var(--bg); }
 
     .li-left { flex: 1; min-width: 0; }
 
     .li-name {
-      font-size: 14.5px;
+      font-size: var(--fs-md);
       font-weight: 600;
       color: var(--text);
       line-height: 1.3;
     }
 
     .li-meta {
-      font-size: 12px;
+      font-size: var(--fs-sm);
       color: var(--muted);
       margin-top: 4px;
     }
@@ -371,13 +416,13 @@
     .li-right { flex-shrink: 0; text-align: right; }
 
     .li-total {
-      font-size: 16px;
+      font-size: var(--fs-md);
       font-weight: 800;
       color: var(--accent);
     }
 
     .li-weight {
-      font-size: 11px;
+      font-size: var(--fs-sm);
       color: var(--muted);
       margin-top: 3px;
     }
@@ -388,8 +433,8 @@
       color: var(--muted);
     }
     .empty-icon  { font-size: 42px; margin-bottom: 12px; }
-    .empty-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
-    .empty-sub   { font-size: 13px; }
+    .empty-title { font-size: var(--fs-lg); font-weight: 600; margin-bottom: 6px; }
+    .empty-sub   { font-size: var(--fs-sm); }
   </style>
 </head>
 <body>
@@ -430,8 +475,7 @@
 <div id="listScreen">
 
   <div class="sticky-top">
-    <!-- Purple section -->
-    <div class="purple-bar">
+    <div class="top-bar">
       <div class="header-nav">
         <button class="back-btn" onclick="goBack()">
           <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -440,12 +484,11 @@
         </button>
       </div>
       <div class="period-badge" id="periodBadge">1 Month</div>
-      <div class="period-sub" id="periodSub">worth of groceries</div>
+      <div class="period-sub">worth of groceries</div>
     </div>
-    <!-- Search bar — outside purple -->
     <div class="search-section">
       <div class="search-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="search-icon" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
         <input type="search" id="searchInput" placeholder="Search items…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
@@ -469,14 +512,23 @@
   <div class="items-wrap">
     <div class="toolbar">
       <div class="results-label" id="resultsLabel"></div>
-      <select class="sort-select" id="sortSelect">
-        <option value="name-asc" selected>Name A–Z</option>
-        <option value="name-desc">Name Z–A</option>
-        <option value="total-desc">Total: High–Low</option>
-        <option value="total-asc">Total: Low–High</option>
-        <option value="unit-desc">Unit: High–Low</option>
-        <option value="unit-asc">Unit: Low–High</option>
-      </select>
+      <div class="sort-wrap">
+        <button class="sort-btn" id="sortBtn" aria-label="Sort">
+          <svg viewBox="0 0 24 24" stroke-width="2.5">
+            <line x1="4" y1="6" x2="20" y2="6"/>
+            <line x1="7" y1="12" x2="17" y2="12"/>
+            <line x1="10" y1="18" x2="14" y2="18"/>
+          </svg>
+        </button>
+        <select id="sortSelect">
+          <option value="name-asc" selected>Name A–Z</option>
+          <option value="name-desc">Name Z–A</option>
+          <option value="total-desc">Total: High–Low</option>
+          <option value="total-asc">Total: Low–High</option>
+          <option value="unit-desc">Unit: High–Low</option>
+          <option value="unit-asc">Unit: Low–High</option>
+        </select>
+      </div>
     </div>
     <div class="list-container" id="itemsList"></div>
     <div class="empty" id="emptyState" style="display:none">
@@ -523,7 +575,7 @@ const ITEMS = [
   { name: "Chicken Stock Cubes",           size: "105g",           qty: 1,  total: 4.00,  weightKg: 0.105, volumeL: null, category: "Pantry"         },
   { name: "Mi Goreng Noodles",             size: "5 x 85g",        qty: 1,  total: 3.95,  weightKg: 0.425, volumeL: null, category: "Pantry"         },
   { name: "Rock Salt",                     size: "500g",           qty: 1,  total: 2.80,  weightKg: 0.5,   volumeL: null, category: "Pantry"         },
-  { name: "Laundry Liquid",               size: "3.6L",            qty: 1,  total: 16.50, weightKg: null,  volumeL: 3.6,  category: "Household"      },
+  { name: "Laundry Liquid",                size: "3.6L",           qty: 1,  total: 16.50, weightKg: null,  volumeL: 3.6,  category: "Household"      },
   { name: "Dishwand Refill",               size: "3 pack",         qty: 1,  total: 6.00,  weightKg: null,  volumeL: null, category: "Household"      },
   { name: "Fabric Conditioner",            size: "2L",             qty: 1,  total: 3.00,  weightKg: null,  volumeL: 2,    category: "Household"      },
   { name: "Toilet Paper",                  size: "12 pack",        qty: 1,  total: 13.50, weightKg: null,  volumeL: null, category: "Household"      }
@@ -533,41 +585,56 @@ const ITEMS = [
 let scaleFactor = 1;
 let currentCat = 'All', currentQuery = '', currentSort = 'name-asc';
 
-// ── navigation ────────────────────────────────
+// ── screen transitions ────────────────────────
 function goToList(btn) {
   scaleFactor = parseFloat(btn.dataset.scale);
   document.getElementById('periodBadge').textContent = btn.dataset.label;
-  document.getElementById('welcomeScreen').style.display = 'none';
-  document.getElementById('listScreen').style.display = 'block';
-  currentCat = 'All'; currentQuery = ''; currentSort = 'default';
-  document.getElementById('searchInput').value = '';
-  document.getElementById('clearBtn').style.display = 'none';
-  document.getElementById('sortSelect').value = 'name-asc';
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  render();
-  window.scrollTo(0, 0);
+
+  const welcome = document.getElementById('welcomeScreen');
+  const list    = document.getElementById('listScreen');
+
+  welcome.classList.add('screen-exit');
+  setTimeout(() => {
+    welcome.style.display = 'none';
+    welcome.classList.remove('screen-exit');
+    list.style.display = 'block';
+    list.classList.add('screen-enter-fwd');
+    setTimeout(() => list.classList.remove('screen-enter-fwd'), 300);
+
+    currentCat = 'All'; currentQuery = ''; currentSort = 'name-asc';
+    document.getElementById('searchInput').value = '';
+    document.getElementById('clearBtn').style.display = 'none';
+    document.getElementById('sortSelect').value = 'name-asc';
+    document.getElementById('sortBtn').classList.remove('active-sort');
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    render();
+    window.scrollTo(0, 0);
+  }, 180);
 }
 
 function goBack() {
-  document.getElementById('listScreen').style.display = 'none';
-  document.getElementById('welcomeScreen').style.display = 'flex';
-  window.scrollTo(0, 0);
+  const welcome = document.getElementById('welcomeScreen');
+  const list    = document.getElementById('listScreen');
+
+  list.classList.add('screen-exit');
+  setTimeout(() => {
+    list.style.display = 'none';
+    list.classList.remove('screen-exit');
+    welcome.style.display = 'flex';
+    welcome.classList.add('screen-enter-back');
+    setTimeout(() => welcome.classList.remove('screen-enter-back'), 300);
+    window.scrollTo(0, 0);
+  }, 180);
 }
 
 // ── helpers ───────────────────────────────────
 function fmt(n) { return '$' + n.toFixed(2); }
 
-function scaledQty(item) {
-  return Math.max(1, Math.ceil(item.qty * scaleFactor));
-}
+function fmtNum(n) { return parseFloat(n.toFixed(2)); }
 
-function scaledTotal(item) {
-  return scaledQty(item) * (item.total / item.qty);
-}
+function scaledQty(item) { return Math.max(1, Math.ceil(item.qty * scaleFactor)); }
 
-function fmtNum(n) {
-  return parseFloat(n.toFixed(2));
-}
+function scaledTotal(item) { return scaledQty(item) * (item.total / item.qty); }
 
 function totalWeightStr(item) {
   const sq = scaledQty(item);
@@ -625,7 +692,7 @@ function getFiltered() {
 }
 
 function render() {
-  const list = getFiltered();
+  const list   = getFiltered();
   const listEl = document.getElementById('itemsList');
   const emptyEl = document.getElementById('emptyState');
   const labelEl = document.getElementById('resultsLabel');
@@ -657,6 +724,7 @@ document.getElementById('clearBtn').addEventListener('click', function() {
 
 document.getElementById('sortSelect').addEventListener('change', function() {
   currentSort = this.value;
+  document.getElementById('sortBtn').classList.toggle('active-sort', this.value !== 'name-asc');
   render();
 });
 
