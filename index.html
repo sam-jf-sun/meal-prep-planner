@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Meal Prep Planner</title>
+  <style>
+    :root {
+      --accent: #7C0B99;
+      --accent-dim: rgba(124,11,153,0.12);
+      --bg: #F4F4F6;
+      --card: #FFFFFF;
+      --text: #111111;
+      --muted: #6B6B6B;
+      --border: #E3E3E8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ════════════════════════════════
+       WELCOME SCREEN
+    ════════════════════════════════ */
+    #welcomeScreen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+    }
+
+    .w-hero {
+      background: linear-gradient(145deg, #7C0B99 0%, #60087a 100%);
+      padding: 68px 28px 48px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      border-radius: 0 0 40px 40px;
+    }
+
+    .w-hero::before {
+      content: '';
+      position: absolute;
+      top: -50px;
+      right: -60px;
+      width: 230px;
+      height: 230px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+      pointer-events: none;
+    }
+
+    .w-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -70px;
+      left: -30px;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      pointer-events: none;
+    }
+
+    .w-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.6;
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .w-greeting {
+      font-size: 44px;
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 14px;
+      position: relative;
+      letter-spacing: -0.5px;
+    }
+
+    .w-question {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.55;
+      opacity: 0.82;
+      position: relative;
+    }
+
+    .w-prompt {
+      padding: 28px 20px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .w-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 0 20px 48px;
+    }
+
+    .opt-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 20px 18px 18px;
+      background: var(--card);
+      border: 2px solid transparent;
+      border-radius: 18px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+      transition: border-color 0.12s, transform 0.1s;
+      text-align: left;
+      width: 100%;
+      animation: fadeUp 0.35s ease both;
+    }
+
+    .opt-btn:nth-child(1) { animation-delay: 0.05s; }
+    .opt-btn:nth-child(2) { animation-delay: 0.1s;  }
+    .opt-btn:nth-child(3) { animation-delay: 0.15s; }
+    .opt-btn:nth-child(4) { animation-delay: 0.2s;  }
+
+    .opt-btn:active {
+      border-color: var(--accent);
+      transform: scale(0.96);
+    }
+
+    .opt-number {
+      font-size: 46px;
+      font-weight: 900;
+      color: var(--accent);
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .opt-unit {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 2px;
+    }
+
+    .opt-days {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 10px;
+      font-weight: 500;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ════════════════════════════════
+       LIST SCREEN
+    ════════════════════════════════ */
+    #listScreen { display: none; }
+
+    /* Sticky block: purple bar + search below it */
+    .sticky-top {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+
+    .purple-bar {
+      background: var(--bg);
+      padding: 10px 16px;
+    }
+
+    .header-nav {
+      display: flex;
+      align-items: center;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      opacity: 0.75;
+      padding: 4px 8px 4px 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      align-items: center;
+    }
+
+    .back-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--text);
+      fill: none;
+    }
+
+    .period-badge {
+      text-align: center;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-top: 8px;
+    }
+
+    .period-sub {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+      padding-bottom: 2px;
+    }
+
+    /* Search bar — outside purple, still inside sticky block */
+    .search-section {
+      background: var(--bg);
+      padding: 10px 16px;
+    }
+
+    .search-wrap { position: relative; }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      stroke: #999;
+      pointer-events: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 11px 36px 11px 38px;
+      border-radius: 24px;
+      border: none;
+      font-size: 16px;
+      background: rgba(255,255,255,0.75);
+      color: var(--text);
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    #searchInput::placeholder { color: #aaa; }
+
+    #clearBtn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #bbb;
+      border: none;
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── CHIPS ── */
+    .chips-wrap { padding: 10px 16px; }
+
+    .chips {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+
+    .chip {
+      flex-shrink: 0;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: none;
+      background: white;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.12s, color 0.12s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .chip.active {
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+
+    /* ── ITEMS ── */
+    .items-wrap { padding: 4px 14px 40px; }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding: 0 2px;
+    }
+
+    .results-label { font-size: 12px; color: var(--muted); }
+
+    .sort-select {
+      font-size: 12px;
+      color: var(--muted);
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 22px 5px 8px;
+      cursor: pointer;
+      outline: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23bbb'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 7px center;
+    }
+
+    .list-container {
+      background: var(--card);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    }
+
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .list-item:last-child { border-bottom: none; }
+
+    .li-left { flex: 1; min-width: 0; }
+
+    .li-name {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .li-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .li-right { flex-shrink: 0; text-align: right; }
+
+    .li-total {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .li-weight {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--muted);
+    }
+    .empty-icon  { font-size: 42px; margin-bottom: 12px; }
+    .empty-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .empty-sub   { font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<!-- ══ WELCOME SCREEN ══ -->
+<div id="welcomeScreen">
+  <div class="w-hero">
+    <div class="w-eyebrow">Meal Prep Planner</div>
+    <div class="w-greeting">Hi, Sam & Mike</div>
+    <div class="w-question">Ready to stock up? Let's build your grocery list.</div>
+  </div>
+  <div class="w-prompt">How long are you prepping?</div>
+  <div class="w-options">
+    <button class="opt-btn" data-scale="0.25" data-label="1 Week" onclick="goToList(this)">
+      <div class="opt-number">1</div>
+      <div class="opt-unit">Week</div>
+      <div class="opt-days">~7 days</div>
+    </button>
+    <button class="opt-btn" data-scale="0.5" data-label="2 Weeks" onclick="goToList(this)">
+      <div class="opt-number">2</div>
+      <div class="opt-unit">Weeks</div>
+      <div class="opt-days">~14 days</div>
+    </button>
+    <button class="opt-btn" data-scale="0.75" data-label="3 Weeks" onclick="goToList(this)">
+      <div class="opt-number">3</div>
+      <div class="opt-unit">Weeks</div>
+      <div class="opt-days">~21 days</div>
+    </button>
+    <button class="opt-btn" data-scale="1" data-label="1 Month" onclick="goToList(this)">
+      <div class="opt-number">1</div>
+      <div class="opt-unit">Month</div>
+      <div class="opt-days">~30 days</div>
+    </button>
+  </div>
+</div>
+
+<!-- ══ LIST SCREEN ══ -->
+<div id="listScreen">
+
+  <div class="sticky-top">
+    <!-- Purple section -->
+    <div class="purple-bar">
+      <div class="header-nav">
+        <button class="back-btn" onclick="goBack()">
+          <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+      </div>
+      <div class="period-badge" id="periodBadge">1 Month</div>
+      <div class="period-sub" id="periodSub">worth of groceries</div>
+    </div>
+    <!-- Search bar — outside purple -->
+    <div class="search-section">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="search" id="searchInput" placeholder="Search items…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button id="clearBtn" aria-label="Clear">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="chips-wrap">
+    <div class="chips" id="chips">
+      <button class="chip" data-cat="Meat &amp; Seafood">Meat</button>
+      <button class="chip" data-cat="Dairy &amp; Eggs">Dairy &amp; Eggs</button>
+      <button class="chip" data-cat="Fruit &amp; Veg">Fruit &amp; Veg</button>
+      <button class="chip" data-cat="Pantry">Pantry</button>
+      <button class="chip" data-cat="Beverages">Beverages</button>
+      <button class="chip" data-cat="Snacks">Snacks</button>
+      <button class="chip" data-cat="Household">Household</button>
+    </div>
+  </div>
+
+  <div class="items-wrap">
+    <div class="toolbar">
+      <div class="results-label" id="resultsLabel"></div>
+      <select class="sort-select" id="sortSelect">
+        <option value="name-asc" selected>Name A–Z</option>
+        <option value="name-desc">Name Z–A</option>
+        <option value="total-desc">Total: High–Low</option>
+        <option value="total-asc">Total: Low–High</option>
+        <option value="unit-desc">Unit: High–Low</option>
+        <option value="unit-asc">Unit: Low–High</option>
+      </select>
+    </div>
+    <div class="list-container" id="itemsList"></div>
+    <div class="empty" id="emptyState" style="display:none">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">No items found</div>
+      <div class="empty-sub">Try a different search or category</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const ITEMS = [
+  { name: "Diced Beef",                    size: "500g",           qty: 4,  total: 52.00, weightKg: 0.5,   volumeL: null, category: "Meat & Seafood" },
+  { name: "Free Range Eggs",               size: "12 Pack | 700g", qty: 8,  total: 52.00, weightKg: 0.7,   volumeL: null, category: "Dairy & Eggs"   },
+  { name: "Extra Virgin Olive Oil",        size: "1L",             qty: 1,  total: 13.00, weightKg: null,  volumeL: 1,    category: "Pantry"         },
+  { name: "Coriander",                     size: "1 Bunch",        qty: 2,  total: 5.80,  weightKg: null,  volumeL: null, category: "Fruit & Veg"   },
+  { name: "Black Peppercorns",             size: "190g",           qty: 1,  total: 7.00,  weightKg: 0.19,  volumeL: null, category: "Pantry"         },
+  { name: "Garlic",                        size: "3 pack",         qty: 2,  total: 7.60,  weightKg: null,  volumeL: null, category: "Fruit & Veg"   },
+  { name: "Pasta Spirals",                 size: "500g",           qty: 4,  total: 4.00,  weightKg: 0.5,   volumeL: null, category: "Pantry"         },
+  { name: "Truss Tomatoes",                size: "approx. 130g",   qty: 6,  total: 5.38,  weightKg: 0.13,  volumeL: null, category: "Fruit & Veg"   },
+  { name: "Carrots",                       size: "1.5kg",          qty: 3,  total: 7.80,  weightKg: 1.5,   volumeL: null, category: "Fruit & Veg"   },
+  { name: "Food Containers",               size: "750ml | 5 Pack", qty: 2,  total: 7.00,  weightKg: null,  volumeL: null, category: "Household"      },
+  { name: "Potatoes",                      size: "4kg",            qty: 2,  total: 17.00, weightKg: 4,     volumeL: null, category: "Fruit & Veg"   },
+  { name: "Free Range Chicken Thigh",      size: "approx. 1.25kg", qty: 2,  total: 42.50, weightKg: 1.25,  volumeL: null, category: "Meat & Seafood" },
+  { name: "Rooibos Tea",                   size: "40 pack",        qty: 1,  total: 7.00,  weightKg: null,  volumeL: null, category: "Beverages"      },
+  { name: "Vanilla Latte Coffee Sachets",  size: "10 pack",        qty: 6,  total: 30.00, weightKg: null,  volumeL: null, category: "Beverages"      },
+  { name: "Salted Butter",                 size: "500g",           qty: 2,  total: 15.00, weightKg: 0.5,   volumeL: null, category: "Dairy & Eggs"   },
+  { name: "Milk Chocolate Block",          size: "315g",           qty: 4,  total: 34.00, weightKg: 0.315, volumeL: null, category: "Snacks"         },
+  { name: "Lactose Free Full Cream Milk",  size: "1L",             qty: 9,  total: 18.00, weightKg: null,  volumeL: 1,    category: "Dairy & Eggs"   },
+  { name: "Beef Regular Mince",            size: "1kg",            qty: 4,  total: 56.00, weightKg: 1,     volumeL: null, category: "Meat & Seafood" },
+  { name: "Yoghurt",                       size: "170g",           qty: 4,  total: 8.80,  weightKg: 0.17,  volumeL: null, category: "Dairy & Eggs"   },
+  { name: "Raw Sugar",                     size: "1kg",            qty: 1,  total: 1.80,  weightKg: 1,     volumeL: null, category: "Pantry"         },
+  { name: "Tomato Paste",                  size: "500g",           qty: 2,  total: 4.00,  weightKg: 0.5,   volumeL: null, category: "Pantry"         },
+  { name: "Coca-Cola Classic",             size: "2L",             qty: 4,  total: 14.00, weightKg: null,  volumeL: 2,    category: "Beverages"      },
+  { name: "Free Range Chicken Breast",     size: "approx. 1.25kg", qty: 3,  total: 52.50, weightKg: 1.25,  volumeL: null, category: "Meat & Seafood" },
+  { name: "Mayonnaise",                    size: "500mL",          qty: 1,  total: 5.00,  weightKg: null,  volumeL: 0.5,  category: "Pantry"         },
+  { name: "Basa Fillets",                  size: "1kg",            qty: 2,  total: 18.00, weightKg: 1,     volumeL: null, category: "Meat & Seafood" },
+  { name: "Chicken Drumsticks",            size: "2kg",            qty: 1,  total: 8.00,  weightKg: 2,     volumeL: null, category: "Meat & Seafood" },
+  { name: "Greek Style Yoghurt",           size: "750g | 6 Pack",  qty: 1,  total: 5.70,  weightKg: 0.75,  volumeL: null, category: "Dairy & Eggs"   },
+  { name: "Basmati Rice",                  size: "5kg",            qty: 1,  total: 18.00, weightKg: 5,     volumeL: null, category: "Pantry"         },
+  { name: "Italian Herbs",                 size: "140g",           qty: 1,  total: 6.00,  weightKg: 0.14,  volumeL: null, category: "Pantry"         },
+  { name: "Paprika",                       size: "100g",           qty: 1,  total: 2.85,  weightKg: 0.1,   volumeL: null, category: "Pantry"         },
+  { name: "Chicken Stock Cubes",           size: "105g",           qty: 1,  total: 4.00,  weightKg: 0.105, volumeL: null, category: "Pantry"         },
+  { name: "Mi Goreng Noodles",             size: "5 x 85g",        qty: 1,  total: 3.95,  weightKg: 0.425, volumeL: null, category: "Pantry"         },
+  { name: "Rock Salt",                     size: "500g",           qty: 1,  total: 2.80,  weightKg: 0.5,   volumeL: null, category: "Pantry"         },
+  { name: "Laundry Liquid",               size: "3.6L",            qty: 1,  total: 16.50, weightKg: null,  volumeL: 3.6,  category: "Household"      },
+  { name: "Dishwand Refill",               size: "3 pack",         qty: 1,  total: 6.00,  weightKg: null,  volumeL: null, category: "Household"      },
+  { name: "Fabric Conditioner",            size: "2L",             qty: 1,  total: 3.00,  weightKg: null,  volumeL: 2,    category: "Household"      },
+  { name: "Toilet Paper",                  size: "12 pack",        qty: 1,  total: 13.50, weightKg: null,  volumeL: null, category: "Household"      }
+];
+
+// ── state ─────────────────────────────────────
+let scaleFactor = 1;
+let currentCat = 'All', currentQuery = '', currentSort = 'name-asc';
+
+// ── navigation ────────────────────────────────
+function goToList(btn) {
+  scaleFactor = parseFloat(btn.dataset.scale);
+  document.getElementById('periodBadge').textContent = btn.dataset.label;
+  document.getElementById('welcomeScreen').style.display = 'none';
+  document.getElementById('listScreen').style.display = 'block';
+  currentCat = 'All'; currentQuery = ''; currentSort = 'default';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('clearBtn').style.display = 'none';
+  document.getElementById('sortSelect').value = 'name-asc';
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  render();
+  window.scrollTo(0, 0);
+}
+
+function goBack() {
+  document.getElementById('listScreen').style.display = 'none';
+  document.getElementById('welcomeScreen').style.display = 'flex';
+  window.scrollTo(0, 0);
+}
+
+// ── helpers ───────────────────────────────────
+function fmt(n) { return '$' + n.toFixed(2); }
+
+function scaledQty(item) {
+  return Math.max(1, Math.ceil(item.qty * scaleFactor));
+}
+
+function scaledTotal(item) {
+  return scaledQty(item) * (item.total / item.qty);
+}
+
+function fmtNum(n) {
+  return parseFloat(n.toFixed(2));
+}
+
+function totalWeightStr(item) {
+  const sq = scaledQty(item);
+  if (item.weightKg) {
+    const kg = fmtNum(item.weightKg * sq);
+    return kg >= 1 ? kg + 'kg' : fmtNum(kg * 1000) + 'g';
+  }
+  if (item.volumeL) {
+    const l = fmtNum(item.volumeL * sq);
+    return l >= 1 ? l + 'L' : fmtNum(l * 1000) + 'mL';
+  }
+  return null;
+}
+
+function renderItem(item) {
+  const unitPrice = item.total / item.qty;
+  const sq = scaledQty(item);
+  const st = scaledTotal(item);
+  const tw = totalWeightStr(item);
+  const parts = [item.size, `Qty: ${sq}`, `${fmt(unitPrice)}/unit`];
+  if (item.weightKg)     parts.push(fmt(unitPrice / item.weightKg) + '/kg');
+  else if (item.volumeL) parts.push(fmt(unitPrice / item.volumeL) + '/L');
+
+  return `<div class="list-item">
+    <div class="li-left">
+      <div class="li-name">${item.name}</div>
+      <div class="li-meta">${parts.join(' · ')}</div>
+    </div>
+    <div class="li-right">
+      <div class="li-total">${fmt(st)}</div>
+      ${tw ? `<div class="li-weight">${tw} total</div>` : ''}
+    </div>
+  </div>`;
+}
+
+// ── filter + sort ─────────────────────────────
+function getFiltered() {
+  let list = ITEMS.filter(item => {
+    const catMatch = currentCat === 'All' || item.category === currentCat;
+    const q = currentQuery.trim().toLowerCase();
+    const nameMatch = !q || item.name.toLowerCase().includes(q)
+      || item.size.toLowerCase().includes(q)
+      || item.category.toLowerCase().includes(q);
+    return catMatch && nameMatch;
+  });
+  switch (currentSort) {
+    case 'name-asc':   list.sort((a,b) => a.name.localeCompare(b.name)); break;
+    case 'name-desc':  list.sort((a,b) => b.name.localeCompare(a.name)); break;
+    case 'total-desc': list.sort((a,b) => scaledTotal(b) - scaledTotal(a)); break;
+    case 'total-asc':  list.sort((a,b) => scaledTotal(a) - scaledTotal(b)); break;
+    case 'unit-desc':  list.sort((a,b) => (b.total/b.qty) - (a.total/a.qty)); break;
+    case 'unit-asc':   list.sort((a,b) => (a.total/a.qty) - (b.total/b.qty)); break;
+  }
+  return list;
+}
+
+function render() {
+  const list = getFiltered();
+  const listEl = document.getElementById('itemsList');
+  const emptyEl = document.getElementById('emptyState');
+  const labelEl = document.getElementById('resultsLabel');
+  if (list.length === 0) {
+    listEl.innerHTML = ''; listEl.style.display = 'none'; emptyEl.style.display = 'block';
+  } else {
+    emptyEl.style.display = 'none'; listEl.style.display = '';
+    listEl.innerHTML = list.map(renderItem).join('');
+  }
+  labelEl.textContent = list.length === ITEMS.length
+    ? `${ITEMS.length} products`
+    : `${list.length} of ${ITEMS.length} products`;
+}
+
+// ── events ────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', function() {
+  currentQuery = this.value;
+  document.getElementById('clearBtn').style.display = this.value ? 'flex' : 'none';
+  render();
+});
+
+document.getElementById('clearBtn').addEventListener('click', function() {
+  const inp = document.getElementById('searchInput');
+  inp.value = ''; currentQuery = '';
+  this.style.display = 'none';
+  inp.focus();
+  render();
+});
+
+document.getElementById('sortSelect').addEventListener('change', function() {
+  currentSort = this.value;
+  render();
+});
+
+document.getElementById('chips').addEventListener('click', function(e) {
+  const btn = e.target.closest('.chip');
+  if (!btn) return;
+  const isActive = btn.classList.contains('active');
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  if (!isActive) { btn.classList.add('active'); currentCat = btn.dataset.cat; }
+  else { currentCat = 'All'; }
+  render();
+});
+</script>
+</body>
+</html>
